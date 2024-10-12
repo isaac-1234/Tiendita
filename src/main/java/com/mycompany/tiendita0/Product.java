@@ -20,7 +20,6 @@ public class Product {
         this.quantity = quantity;
     }
 
-    // Getters
     public String getName() {
         return name;
     }
@@ -33,15 +32,12 @@ public class Product {
         return quantity;
     }
 
-    // Setters
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    // Display product details
     @Override
     public String toString() {
-        return "Product: " + name + ", Price: $" + price + ", Quantity: " + quantity;
+        return name + ": $" + price + " (Qty: " + quantity + ")";
     }
 }
-

@@ -9,58 +9,40 @@ package com.mycompany.tiendita0;
  * @author caleb
  */
 import java.util.ArrayList;
-import java.util.Scanner;
 
-public class Store {
-    private ArrayList<Product> inventory = new ArrayList<>();
+public class Store implements InventoryManager {
+    public ArrayList<Product> inventory = new ArrayList<>();
 
-    // Add a new product
-    public void addProduct(Product product) {
+    @Override
+    public boolean addProduct(Product product) {
+        for (Product p : inventory) {
+            if (p.getName().equalsIgnoreCase(product.getName())) {
+                System.out.println("Product already exists.");
+                return false;
+            }
+        }
         inventory.add(product);
-        System.out.println("Product added successfully.");
+        return true;
     }
 
-    // Remove a product by name
-    public void removeProduct(String productName) {
-        boolean found = false;
-        for (Product product : inventory) {
-            if (product.getName().equalsIgnoreCase(productName)) {
-                inventory.remove(product);
-                System.out.println("Product removed successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            System.out.println("Product not found.");
-        }
+    @Override
+    public boolean removeProduct(String productName) {
+        return inventory.removeIf(p -> p.getName().equalsIgnoreCase(productName));
     }
 
-    // Display all products
-    public void displayProducts() {
-        if (inventory.isEmpty()) {
-            System.out.println("No products in the inventory.");
-        } else {
-            for (Product product : inventory) {
-                System.out.println(product);
-            }
-        }
+    @Override
+    public void showAllProducts() {
+        inventory.forEach(System.out::println);
     }
 
-    // Update product quantity
-    public void updateProductQuantity(String productName, int newQuantity) {
-        boolean found = false;
-        for (Product product : inventory) {
-            if (product.getName().equalsIgnoreCase(productName)) {
-                product.setQuantity(newQuantity);
-                System.out.println("Product quantity updated successfully.");
-                found = true;
-                break;
+    @Override
+    public boolean updateProductStock(String productName, int quantity) {
+        for (Product p : inventory) {
+            if (p.getName().equalsIgnoreCase(productName)) {
+                p.setQuantity(quantity);
+                return true;
             }
         }
-        if (!found) {
-            System.out.println("Product not found.");
-        }
+        return false;
     }
 }
-
