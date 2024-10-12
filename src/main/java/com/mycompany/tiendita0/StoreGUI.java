@@ -27,7 +27,7 @@ public class StoreGUI extends JFrame implements ActionListener {
         showWelcomeMessage();
         
         // Set up the main window
-        setTitle("Small Store Management System");
+        setTitle("Tiendita0");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -43,15 +43,15 @@ public class StoreGUI extends JFrame implements ActionListener {
         buttonPanel.setLayout(new GridLayout(1, 3)); // Layout for three buttons
         
         // Add buttons
-        JButton addButton = new JButton("Add Product");
+        JButton addButton = new JButton("aniadir Producto");
         addButton.addActionListener(this);
         buttonPanel.add(addButton);
         
-        JButton removeButton = new JButton("Remove Product");
+        JButton removeButton = new JButton("Remover Producto");
         removeButton.addActionListener(this);
         buttonPanel.add(removeButton);
         
-        JButton viewButton = new JButton("View Products");
+        JButton viewButton = new JButton("Ver Productos");
         viewButton.addActionListener(this);
         buttonPanel.add(viewButton);
         
@@ -63,8 +63,8 @@ public class StoreGUI extends JFrame implements ActionListener {
 
     // Method to display a welcome message when the program starts
     private void showWelcomeMessage() {
-        String welcomeMessage = "Welcome to the Small Store Management System!\n" +
-                                "You can add, remove, and view products in the store.";
+        String welcomeMessage = "HOLA, Bievenido a la tiendita0!\n" +
+                                "Puedes agregar o quitar productos";
         JOptionPane.showMessageDialog(this, welcomeMessage, "Welcome", JOptionPane.INFORMATION_MESSAGE);
     }
     
