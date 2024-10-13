@@ -11,14 +11,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * GUI for managing a small store's inventory and users.
- */
 public class StoreGUI extends JFrame implements ActionListener {
-    private Store store;  // Reference to the store object
-    private JTextArea productDisplay; // Text area to display products
-    private ArrayList<User> users; // List of registered users
-    private static final String USER_FILE = "users.dat";  // File to save user data
+    private Store store;
+    private JTextArea productDisplay;
+    private ArrayList<User> users;
+    private static final String USER_FILE = "C:/storeData/users.dat";  // Change the file location here
 
     public StoreGUI(Store store, ArrayList<User> users) {
         this.store = store;
@@ -52,21 +49,19 @@ public class StoreGUI extends JFrame implements ActionListener {
         viewButton.addActionListener(this);
         buttonPanel.add(viewButton);
 
-        add(buttonPanel, BorderLayout.SOUTH); // Add button panel to the bottom of the window
+        add(buttonPanel, BorderLayout.SOUTH);
 
         createAdminMenu(); // Add admin menu
 
         // Load users from file when the application starts
         loadUsers();
 
-        // Display the window
         setVisible(true);
     }
 
-    // Method to create Admin Menu with options for managing users
     private void createAdminMenu() {
-        JMenuBar menuBar = new JMenuBar();  // Create menu bar
-        JMenu adminMenu = new JMenu("Admin Menu");  // Create "Admin Menu"
+        JMenuBar menuBar = new JMenuBar();
+        JMenu adminMenu = new JMenu("Admin Menu");
 
         JMenuItem addUserItem = new JMenuItem("Add User");
         addUserItem.addActionListener(this);
@@ -107,7 +102,6 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Pop-up dialog for adding a product
     private void showAddProductDialog() {
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
@@ -131,7 +125,6 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Pop-up dialog for removing a product
     private void showRemoveProductDialog() {
         String productName = JOptionPane.showInputDialog(this, "Enter product name to remove:");
         if (productName != null && !productName.isEmpty()) {
@@ -143,7 +136,6 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Display all products in the text area
     private void showProducts() {
         productDisplay.setText("");
         StringBuilder sb = new StringBuilder();
@@ -159,7 +151,6 @@ public class StoreGUI extends JFrame implements ActionListener {
         productDisplay.setText(sb.toString());
     }
 
-    // Pop-up dialog to add a user and save to a file
     private void showAddUserDialog() {
         JTextField usernameField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
@@ -176,12 +167,11 @@ public class StoreGUI extends JFrame implements ActionListener {
             String password = new String(passwordField.getPassword());
             User newUser = new User(username, password);
             users.add(newUser);
-            saveUsers();  // Save users to file when a new user is added
+            saveUsers();
             JOptionPane.showMessageDialog(this, "User added successfully!");
         }
     }
 
-    // Display all users in a dialog
     private void showUsers() {
         StringBuilder sb = new StringBuilder();
         if (users.isEmpty()) {
@@ -195,35 +185,35 @@ public class StoreGUI extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, sb.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Save users to a file
     private void saveUsers() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
-            oos.writeObject(users);
-            System.out.println("Users saved successfully to " + USER_FILE);  // Debug message
-    }   catch (IOException e) {
-            e.printStackTrace();  // Print full exception trace for debugging
+        try {
+            File file = new File(USER_FILE);
+            file.getParentFile().mkdirs();  // Create directories if they don't exist
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
+                oos.writeObject(users);
+                System.out.println("Users saved successfully to " + USER_FILE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error saving users: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
-}
 
-    // Load users from a file
-    // Load users from a file
     private void loadUsers() {
         File file = new File(USER_FILE);
         if (file.exists()) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE))) {
-            users = (ArrayList<User>) ois.readObject();
-            System.out.println("Users loaded successfully from " + USER_FILE);  // Debug message
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();  // Print full exception trace for debugging
-            JOptionPane.showMessageDialog(this, "Error loading users: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE))) {
+                users = (ArrayList<User>) ois.readObject();
+                System.out.println("Users loaded successfully from " + USER_FILE);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error loading users: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            System.out.println("No user file found. Starting fresh.");
+            users = new ArrayList<>();
         }
-    } else {
-        System.out.println("No user file found. Starting fresh.");  // Debug message
-        users = new ArrayList<>();  // Initialize an empty user list
     }
-}
-
 
     public static void main(String[] args) {
         Store store = new Store();  // Create store instance
@@ -231,3 +221,4 @@ public class StoreGUI extends JFrame implements ActionListener {
         new StoreGUI(store, users); // Launch GUI
     }
 }
+
