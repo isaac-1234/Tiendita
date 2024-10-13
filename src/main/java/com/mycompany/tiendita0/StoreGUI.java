@@ -15,7 +15,7 @@ public class StoreGUI extends JFrame implements ActionListener {
     private Store store;
     private JTextArea productDisplay;
     private ArrayList<User> users;
-    private static final String USER_FILE = "C:/storeData/users.dat";  // Change the file location here
+    private static final String USER_FILE = "src/main/java/com/mycompany/tiendita0/users.dat";  // Change the file location here
 
     public StoreGUI(Store store, ArrayList<User> users) {
         this.store = store;
@@ -221,4 +221,3 @@ public class StoreGUI extends JFrame implements ActionListener {
         new StoreGUI(store, users); // Launch GUI
     }
 }
-
