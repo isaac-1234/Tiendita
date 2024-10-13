@@ -16,6 +16,6 @@ public class Tiendita0 {
         Store store = new Store();  // Create store instance
         ArrayList<User> users = new ArrayList<>();  // Initialize user list
         new StoreGUI(store, users); // Launch GUI
-    }
+       }
 }
         

@@ -1,0 +1,3 @@
+Pantalon,500.0,25
+camisas,200.0,15
+gorra,150.0,10

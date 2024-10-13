@@ -12,10 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class StoreGUI extends JFrame implements ActionListener {
-    private Store store;
-    private JTextArea productDisplay;
-    private ArrayList<User> users;
-    private static final String USER_FILE = "src/main/java/com/mycompany/tiendita0/users.dat";  // Change the file location here
+    private Store store;  // Reference to the store object
+    private JTextArea productDisplay; // Text area to display products
+    private ArrayList<User> users; // List of registered users
+    private static final String USER_FILE = "src/main/java/com/mycompany/tiendita0/users.txt";  // Text file to save user data
+    private static final String PRODUCT_FILE = "src/main/java/com/mycompany/tiendita0/products.txt";  // Text file to save product data
 
     public StoreGUI(Store store, ArrayList<User> users) {
         this.store = store;
@@ -53,8 +54,9 @@ public class StoreGUI extends JFrame implements ActionListener {
 
         createAdminMenu(); // Add admin menu
 
-        // Load users from file when the application starts
+        // Load users and products from text files when the application starts
         loadUsers();
+        loadProducts();
 
         setVisible(true);
     }
@@ -121,6 +123,7 @@ public class StoreGUI extends JFrame implements ActionListener {
             int quantity = Integer.parseInt(quantityField.getText());
             Product newProduct = new Product(name, price, quantity);
             store.addProduct(newProduct);
+            saveProducts();  // Save products to file
             JOptionPane.showMessageDialog(this, "Product added successfully!");
         }
     }
@@ -129,6 +132,7 @@ public class StoreGUI extends JFrame implements ActionListener {
         String productName = JOptionPane.showInputDialog(this, "Enter product name to remove:");
         if (productName != null && !productName.isEmpty()) {
             if (store.removeProduct(productName)) {
+                saveProducts();  // Save products after removing one
                 JOptionPane.showMessageDialog(this, "Product removed successfully!");
             } else {
                 JOptionPane.showMessageDialog(this, "Product not found.");
@@ -167,7 +171,7 @@ public class StoreGUI extends JFrame implements ActionListener {
             String password = new String(passwordField.getPassword());
             User newUser = new User(username, password);
             users.add(newUser);
-            saveUsers();
+            saveUsers();  // Save users to file
             JOptionPane.showMessageDialog(this, "User added successfully!");
         }
     }
@@ -185,33 +189,80 @@ public class StoreGUI extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, sb.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    // Save users to a text file
     private void saveUsers() {
-        try {
-            File file = new File(USER_FILE);
-            file.getParentFile().mkdirs();  // Create directories if they don't exist
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
-                oos.writeObject(users);
-                System.out.println("Users saved successfully to " + USER_FILE);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_FILE))) {
+            for (User user : users) {
+                writer.write(user.getUsername() + "," + user.getPassword());
+                writer.newLine();
             }
+            System.out.println("Users saved successfully to " + USER_FILE);
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error saving users: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    // Load users from a text file
     private void loadUsers() {
         File file = new File(USER_FILE);
         if (file.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE))) {
-                users = (ArrayList<User>) ois.readObject();
+            try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] userData = line.split(",");
+                    if (userData.length == 2) {
+                        users.add(new User(userData[0], userData[1]));
+                    }
+                }
                 System.out.println("Users loaded successfully from " + USER_FILE);
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error loading users: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             System.out.println("No user file found. Starting fresh.");
             users = new ArrayList<>();
+        }
+    }
+
+    // Save products to a text file
+    private void saveProducts() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
+            for (Product product : store.inventory) {
+                writer.write(product.getName() + "," + product.getPrice() + "," + product.getQuantity());
+                writer.newLine();
+            }
+            System.out.println("Products saved successfully to " + PRODUCT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Load products from a text file
+    private void loadProducts() {
+        File file = new File(PRODUCT_FILE);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] productData = line.split(",");
+                    if (productData.length == 3) {
+                        String name = productData[0];
+                        double price = Double.parseDouble(productData[1]);
+                        int quantity = Integer.parseInt(productData[2]);
+                        store.addProduct(new Product(name, price, quantity));
+                    }
+                }
+                System.out.println("Products loaded successfully from " + PRODUCT_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            System.out.println("No product file found. Starting fresh.");
+            store.inventory = new ArrayList<>();
         }
     }
 
