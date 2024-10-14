@@ -138,15 +138,34 @@ public class StoreGUI extends JFrame implements ActionListener {
     }
 
     private boolean validateLogin(String username, String password) {
-        // Check if the username and password match any user in the list
-        for (User user : users) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                loggedInUser = user;  // Set the current logged-in user
-                return true;
+    File file = new File(USER_FILE);
+    if (file.exists()) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Each line in the file has format: "username,password"
+                String[] userData = line.split(",");
+                if (userData.length == 2) {
+                    String storedUsername = userData[0];
+                    String storedPassword = userData[1];
+                    
+                    // Check if the input username and password match the stored values
+                    if (storedUsername.equals(username) && storedPassword.equals(password)) {
+                        loggedInUser = new User(username, password); // Set the current logged-in user
+                        return true; // Login is successful
+                    }
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error reading user data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        return false;
+    } else {
+        JOptionPane.showMessageDialog(this, "User file not found. Please add users first.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    return false; // Login failed
+}
+
 
     private void showAddProductDialog() {
         JTextField nameField = new JTextField();
@@ -270,14 +289,49 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    private void loadProducts() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
+    // Save products to a text file
     private void saveProducts() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
+            for (Product product : store.inventory) {
+                writer.write(product.getName() + "," + product.getPrice() + "," + product.getQuantity());
+                writer.newLine();
+            }
+            System.out.println("Products saved successfully to " + PRODUCT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
-    
-}
 
-    // Save products to a text
+    // Load products from a text file
+    private void loadProducts() {
+        File file = new File(PRODUCT_FILE);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] productData = line.split(",");
+                    if (productData.length == 3) {
+                        String name = productData[0];
+                        double price = Double.parseDouble(productData[1]);
+                        int quantity = Integer.parseInt(productData[2]);
+                        store.addProduct(new Product(name, price, quantity));
+                    }
+                }
+                System.out.println("Products loaded successfully from " + PRODUCT_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            System.out.println("No product file found. Starting fresh.");
+            store.inventory = new ArrayList<>();
+        }
+    }
+
+    public static void main(String[] args) {
+        Store store = new Store();  // Create store instance
+        ArrayList<User> users = new ArrayList<>();  // Initialize user list
+        new StoreGUI(store, users); // Launch GUI
+    }
+}
