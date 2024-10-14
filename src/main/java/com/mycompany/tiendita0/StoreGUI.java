@@ -17,10 +17,17 @@ public class StoreGUI extends JFrame implements ActionListener {
     private ArrayList<User> users; // List of registered users
     private static final String USER_FILE = "src/main/java/com/mycompany/tiendita0/users.txt";  // Text file to save user data
     private static final String PRODUCT_FILE = "src/main/java/com/mycompany/tiendita0/products.txt";  // Text file to save product data
+    private User loggedInUser;  // The current logged-in user
 
     public StoreGUI(Store store, ArrayList<User> users) {
         this.store = store;
         this.users = users;
+
+        // Attempt login before showing the main interface
+        if (!showLoginDialog()) {
+            // If login fails, exit the program
+            System.exit(0);
+        }
 
         // Set up the main window
         setTitle("Small Store Management System");
@@ -102,6 +109,43 @@ public class StoreGUI extends JFrame implements ActionListener {
                 showUsers();
                 break;
         }
+    }
+
+    private boolean showLoginDialog() {
+        JTextField usernameField = new JTextField();
+        JPasswordField passwordField = new JPasswordField();
+
+        Object[] message = {
+            "Username:", usernameField,
+            "Password:", passwordField,
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            // Validate the username and password
+            if (validateLogin(username, password)) {
+                JOptionPane.showMessageDialog(this, "Login successful! Welcome, " + username);
+                return true; // Login successful
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password. Please try again.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                return showLoginDialog(); // Retry login
+            }
+        }
+        return false; // Cancelled login
+    }
+
+    private boolean validateLogin(String username, String password) {
+        // Check if the username and password match any user in the list
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                loggedInUser = user;  // Set the current logged-in user
+                return true;
+            }
+        }
+        return false;
     }
 
     private void showAddProductDialog() {
@@ -226,49 +270,14 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Save products to a text file
-    private void saveProducts() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
-            for (Product product : store.inventory) {
-                writer.write(product.getName() + "," + product.getPrice() + "," + product.getQuantity());
-                writer.newLine();
-            }
-            System.out.println("Products saved successfully to " + PRODUCT_FILE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // Load products from a text file
     private void loadProducts() {
-        File file = new File(PRODUCT_FILE);
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] productData = line.split(",");
-                    if (productData.length == 3) {
-                        String name = productData[0];
-                        double price = Double.parseDouble(productData[1]);
-                        int quantity = Integer.parseInt(productData[2]);
-                        store.addProduct(new Product(name, price, quantity));
-                    }
-                }
-                System.out.println("Products loaded successfully from " + PRODUCT_FILE);
-            } catch (IOException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            System.out.println("No product file found. Starting fresh.");
-            store.inventory = new ArrayList<>();
-        }
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    public static void main(String[] args) {
-        Store store = new Store();  // Create store instance
-        ArrayList<User> users = new ArrayList<>();  // Initialize user list
-        new StoreGUI(store, users); // Launch GUI
+    private void saveProducts() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
 }
+
+    // Save products to a text
