@@ -179,16 +179,25 @@ public class StoreGUI extends JFrame implements ActionListener {
         };
 
         int option = JOptionPane.showConfirmDialog(this, message, "Add New Product", JOptionPane.OK_CANCEL_OPTION);
-
+         
         if (option == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
             double price = Double.parseDouble(priceField.getText());
             int quantity = Integer.parseInt(quantityField.getText());
-            Product newProduct = new Product(name, price, quantity);
+            Product existingProduct = store.getProductByName(name);
+            
+            if (existingProduct != null){
+                existingProduct.setQuantity(existingProduct.getQuantity()+ quantity);
+                         
+            }
+            else{  
+            Product newProduct = new Product(name,price,quantity);
             store.addProduct(newProduct);
-            saveProducts();  // Save products to file
+          
             JOptionPane.showMessageDialog(this, "Product added successfully!");
         }
+            saveProducts(); 
+    }
     }
 
     private void showRemoveProductDialog() {

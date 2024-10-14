@@ -45,4 +45,14 @@ public class Store implements InventoryManager {
         }
         return false;
     }
+    public Product getProductByName(String name){
+        for (Product product : inventory){
+            if (product.getName().equalsIgnoreCase(name)){
+                return product;
+            }
+        }
+        return null;    
+        
+    }
+    
 }
