@@ -1,4 +1,4 @@
-Pantalon,500.0,45
+Pantalon,500.0,40
 camisas,200.0,20
 gorra,150.0,10
 Guantes,100.0,1
