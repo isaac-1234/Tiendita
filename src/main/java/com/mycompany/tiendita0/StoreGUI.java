@@ -4,6 +4,7 @@
  */
 package com.mycompany.tiendita0;
 
+
 import java.io.*;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -140,76 +141,74 @@ public class StoreGUI extends JFrame implements ActionListener {
     }
 
     private boolean validateLogin(String username, String password) {
-    File file = new File(USER_FILE);
-    if (file.exists()) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Each line in the file has format: "username,password"
-                String[] userData = line.split(",");
-                if (userData.length == 2) {
-                    String storedUsername = userData[0];
-                    String storedPassword = userData[1];
-                    
-                    // Check if the input username and password match the stored values
-                    if (storedUsername.equals(username) && storedPassword.equals(password)) {
-                        loggedInUser = new User(username, password); // Set the current logged-in user
-                        return true; // Login is successful
+        File file = new File(USER_FILE);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Each line in the file has format: "username,password"
+                    String[] userData = line.split(",");
+                    if (userData.length == 2) {
+                        String storedUsername = userData[0];
+                        String storedPassword = userData[1];
+                        
+                        // Check if the input username and password match the stored values
+                        if (storedUsername.equals(username) && storedPassword.equals(password)) {
+                            loggedInUser = new User(username, password); // Set the current logged-in user
+                            return true; // Login is successful
+                        }
                     }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error reading user data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error reading user data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "User file not found. Please add users first.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "User file not found. Please add users first.", "Error", JOptionPane.ERROR_MESSAGE);
+        return false; // Login failed
     }
-    return false; // Login failed
-}
-
 
     private void showAddProductDialog() {
-    JTextField nameField = new JTextField();
-    JTextField priceField = new JTextField();
-    JTextField quantityField = new JTextField();
-    JTextField dateField = new JTextField(new SimpleDateFormat("yyyy-MM-dd").format(new Date())); // Default to today's date
+        JTextField nameField = new JTextField();
+        JTextField priceField = new JTextField();
+        JTextField quantityField = new JTextField();
+        JTextField dateField = new JTextField(new SimpleDateFormat("yyyy-MM-dd").format(new Date())); // Default to today's date
 
-    Object[] message = {
-        "Product Name:", nameField,
-        "Product Price:", priceField,  // Only relevant for new products
-        "Product Quantity:", quantityField,
-        "Date Added (yyyy-MM-dd):", dateField
-    };
+        Object[] message = {
+            "Product Name:", nameField,
+            "Product Price:", priceField,  // Only relevant for new products
+            "Product Quantity:", quantityField,
+            "Date Added (yyyy-MM-dd):", dateField
+        };
 
-    int option = JOptionPane.showConfirmDialog(this, message, "Add or Update Product", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Add or Update Product", JOptionPane.OK_CANCEL_OPTION);
 
-    if (option == JOptionPane.OK_OPTION) {
-        String name = nameField.getText();
-        double price;
-        int quantity = Integer.parseInt(quantityField.getText());
-        String dateAdded = dateField.getText();
+        if (option == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            double price;
+            int quantity = Integer.parseInt(quantityField.getText());
+            String dateAdded = dateField.getText();
 
-        // Check if the product already exists in the store
-        Product existingProduct = store.getProductByName(name);
+            // Check if the product already exists in the store
+            Product existingProduct = store.getProductByName(name);
 
-        if (existingProduct != null) {
-            // If the product exists, update its quantity
-            existingProduct.setQuantity(existingProduct.getQuantity() + quantity);
-            JOptionPane.showMessageDialog(this, "Quantity updated successfully! New quantity: " + existingProduct.getQuantity());
-        } else {
-            // If it's a new product, add it to the store
-            price = Double.parseDouble(priceField.getText());
-            Product newProduct = new Product(name, price, quantity, dateAdded);
-            store.addProduct(newProduct);
-            JOptionPane.showMessageDialog(this, "Product added successfully!");
+            if (existingProduct != null) {
+                // If the product exists, update its quantity
+                existingProduct.setQuantity(existingProduct.getQuantity() + quantity);
+                JOptionPane.showMessageDialog(this, "Quantity updated successfully! New quantity: " + existingProduct.getQuantity());
+            } else {
+                // If it's a new product, add it to the store
+                price = Double.parseDouble(priceField.getText());
+                Product newProduct = new Product(name, price, quantity, dateAdded);
+                store.addProduct(newProduct);
+                JOptionPane.showMessageDialog(this, "Product added successfully!");
+            }
+
+            // Save the updated inventory to the file
+            saveProducts();
         }
-
-        // Save the updated inventory to the file
-        saveProducts();
     }
-}
-
 
     private void showRemoveProductDialog() {
         String productName = JOptionPane.showInputDialog(this, "Enter product name to remove:");
@@ -252,27 +251,61 @@ public class StoreGUI extends JFrame implements ActionListener {
         if (option == JOptionPane.OK_OPTION) {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
+
             User newUser = new User(username, password);
             users.add(newUser);
-            saveUsers();  // Save users to file
+            saveUsers(); // Save the users to file
             JOptionPane.showMessageDialog(this, "User added successfully!");
         }
     }
 
     private void showUsers() {
         StringBuilder sb = new StringBuilder();
-        if (users.isEmpty()) {
-            sb.append("No users have been added.");
-        } else {
-            sb.append("Current Users:\n");
-            for (User user : users) {
-                sb.append(user).append("\n");
-            }
+        for (User user : users) {
+            sb.append(user.getUsername()).append("\n");
         }
-        JOptionPane.showMessageDialog(this, sb.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, sb.toString(), "Registered Users", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Save users to a text file
+    private void saveProducts() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
+            for (Product product : store.inventory) {
+                writer.write(product.getName() + "," + product.getPrice() + "," + product.getQuantity() + "," + product.getDateAdded());
+                writer.newLine();
+            }
+            System.out.println("Products saved successfully to " + PRODUCT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void loadProducts() {
+        File file = new File(PRODUCT_FILE);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] productData = line.split(",");
+                    if (productData.length == 4) {
+                        String name = productData[0];
+                        double price = Double.parseDouble(productData[1]);
+                        int quantity = Integer.parseInt(productData[2]);
+                        String dateAdded = productData[3];
+                        store.addProduct(new Product(name, price, quantity, dateAdded));
+                    }
+                }
+                System.out.println("Products loaded successfully from " + PRODUCT_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            System.out.println("No product file found. Starting fresh.");
+            store.inventory = new ArrayList<>();
+        }
+    }
+
     private void saveUsers() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_FILE))) {
             for (User user : users) {
@@ -286,7 +319,6 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Load users from a text file
     private void loadUsers() {
         File file = new File(USER_FILE);
         if (file.exists()) {
@@ -295,7 +327,9 @@ public class StoreGUI extends JFrame implements ActionListener {
                 while ((line = reader.readLine()) != null) {
                     String[] userData = line.split(",");
                     if (userData.length == 2) {
-                        users.add(new User(userData[0], userData[1]));
+                        String username = userData[0];
+                        String password = userData[1];
+                        users.add(new User(username, password));
                     }
                 }
                 System.out.println("Users loaded successfully from " + USER_FILE);
@@ -309,52 +343,9 @@ public class StoreGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Save products to a text file
-    private void saveProducts() {
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
-        for (Product product : store.inventory) {
-            writer.write(product.getName() + "," + product.getPrice() + "," + product.getQuantity() + "," + product.getDateAdded());
-            writer.newLine();
-        }
-        System.out.println("Products saved successfully to " + PRODUCT_FILE);
-    } catch (IOException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error saving products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
-
-
-    // Load products from a text file
-    private void loadProducts() {
-    File file = new File(PRODUCT_FILE);
-    if (file.exists()) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] productData = line.split(",");
-                if (productData.length == 4) {
-                    String name = productData[0];
-                    double price = Double.parseDouble(productData[1]);
-                    int quantity = Integer.parseInt(productData[2]);
-                    String dateAdded = productData[3];
-                    store.addProduct(new Product(name, price, quantity, dateAdded));
-                }
-            }
-            System.out.println("Products loaded successfully from " + PRODUCT_FILE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    } else {
-        System.out.println("No product file found. Starting fresh.");
-        store.inventory = new ArrayList<>();
-    }
-}
-
-
     public static void main(String[] args) {
-        Store store = new Store();  // Create store instance
-        ArrayList<User> users = new ArrayList<>();  // Initialize user list
-        new StoreGUI(store, users); // Launch GUI
+        Store store = new Store();
+        ArrayList<User> users = new ArrayList<>();
+        new StoreGUI(store, users);
     }
 }
