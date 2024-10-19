@@ -18,8 +18,8 @@ public class StoreGUI extends JFrame implements ActionListener {
     private Store store;  // Reference to the store object
     private JTextArea productDisplay; // Text area to display products
     private ArrayList<User> users; // List of registered users
-    private static final String USER_FILE = "src/main/java/com/mycompany/tiendita0/users.txt";  // Text file to save user data
-    private static final String PRODUCT_FILE = "src/main/java/com/mycompany/tiendita0/products.txt";  // Text file to save product data
+    private static final String USER_FILE = "users.txt";  // Text file to save user data
+    private static final String PRODUCT_FILE = "products.txt";  // Text file to save product data
     private User loggedInUser;  // The current logged-in user
 
     public StoreGUI(Store store, ArrayList<User> users) {
