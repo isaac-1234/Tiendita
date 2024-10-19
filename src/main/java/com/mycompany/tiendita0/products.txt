@@ -1,7 +1,0 @@
-Pantalon,500.0,40
-camisas,200.0,20
-gorra,150.0,10
-Guantes,100.0,1
-Camisetas,100.0,1
-Lentes,500.0,1
-Gafas,600.0,1
