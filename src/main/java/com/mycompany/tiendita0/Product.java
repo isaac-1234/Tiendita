@@ -18,26 +18,29 @@ public class Product implements Serializable {
     private double price;
     private int quantity;
     private String dateAdded;
+    private String concept; // New field for the concept
 
-    // Constructor with date
-    public Product(String name, double price, int quantity, String dateAdded) {
+    // Constructor with concept
+    public Product(String name, double price, int quantity, String dateAdded, String concept) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.dateAdded = dateAdded;
+        this.concept = concept;
     }
 
-    // Setters and Getters
+    // Getters and setters
     public String getName() { return name; }
     public double getPrice() { return price; }
     public int getQuantity() { return quantity; }
     public String getDateAdded() { return dateAdded; }
+    public String getConcept() { return concept; }
 
     public void setQuantity(int quantity) { this.quantity = quantity; }
 
     @Override
     public String toString() {
-        return name + " (Price: " + price + ", Quantity: " + quantity + ", Date Added: " + dateAdded + ")";
+        return name + " (Price: " + price + ", Quantity: " + quantity + ", Date Added: " + dateAdded + ", Concept: " + concept + ")";
     }
 }
 
