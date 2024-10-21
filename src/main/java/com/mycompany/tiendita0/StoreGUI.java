@@ -80,8 +80,11 @@ public class StoreGUI extends JFrame {
     private void setupAccessBasedOnRole(String role) {
         if (role.equals("Admin")) {
             JButton addUserButton = new JButton("Add User");
+            JButton addProductButton = new JButton("Add Product");
             addUserButton.addActionListener(e -> showAddUserDialog());
+            addProductButton.addActionListener(e -> showAddProductDialog());
             ((JPanel) getContentPane().getComponent(1)).add(addUserButton);
+            ((JPanel) getContentPane().getComponent(1)).add(addProductButton);
             revalidate(); // Refresh the layout
         } else {
             // Hide admin features for normal users if needed
@@ -119,6 +122,55 @@ public class StoreGUI extends JFrame {
                 saveUsers();  // Save new user to file
                 JOptionPane.showMessageDialog(this, "User added successfully!");
             }
+        }
+    }
+
+    private void showAddProductDialog() {
+        if (currentUser == null || !currentUser.getRole().equals("Admin")) {
+            JOptionPane.showMessageDialog(this, "Access denied! Only admins can add products.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JTextField nameField = new JTextField();
+        JTextField priceField = new JTextField();
+        JTextField quantityField = new JTextField();
+        JTextField dateAddedField = new JTextField(); // For the date added
+        JTextField conceptField = new JTextField(); // For the product concept
+
+        Object[] message = {
+            "Product Name:", nameField,
+            "Price:", priceField,
+            "Quantity:", quantityField,
+            "Date Added (YYYY-MM-DD):", dateAddedField,
+            "Concept:", conceptField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Add Product", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            double price = Double.parseDouble(priceField.getText());
+            int quantity = Integer.parseInt(quantityField.getText());
+            String dateAdded = dateAddedField.getText();
+            String concept = conceptField.getText();
+
+            Product newProduct = new Product(name, price, quantity, dateAdded, concept);
+            store.addProduct(newProduct);
+            saveProducts(); // Save the new product to the file
+            JOptionPane.showMessageDialog(this, "Product added successfully!");
+        }
+    }
+
+    private void saveProducts() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
+            for (Product product : store.inventory) {
+                writer.write(product.getName() + "," + product.getPrice() + "," + product.getQuantity() + "," + product.getDateAdded() + "," + product.getConcept());
+                writer.newLine();
+            }
+            System.out.println("Products saved successfully to " + PRODUCT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
