@@ -1,4 +1,4 @@
-Caleb,1234
+Caleb,1234,Admin
 Silvia,630430
 Maria,611212
 ,
