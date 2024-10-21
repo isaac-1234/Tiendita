@@ -14,26 +14,25 @@ import java.io.Serializable;
  * User class to store username and password.
  * Implements Serializable to allow saving to a file.
  */
+import java.io.Serializable;
+
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;  // Version control for Serializable
     private String username;
     private String password;
+    private String role; // New field for user role
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.role = role; // Set user role
     }
 
-    public String getUsername() {
-        return username;
+    User(String username, String password, String role) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String toString() {
-        return "Username: " + username;
-    }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public String getRole() { return role; } // New getter for role
 }
+
